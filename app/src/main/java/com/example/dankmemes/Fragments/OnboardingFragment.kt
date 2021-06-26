@@ -10,6 +10,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.PermissionChecker
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.example.dankmemes.R
@@ -96,7 +97,8 @@ class OnboardingFragment : Fragment() {
                         findNavController().navigate(R.id.action_onboardingFragment_to_mainFragment)
                         onBoardingFinished()
                     } else {
-                        onboardingMessageTV.text = "If you want to continue W/O permission click continue without functionality Or grant permission"
+                        onboardingMessageTV.text = "If you want to continue without permission click continue without functionality Or grant permission"
+                        nextWOpermission.visibility = View.VISIBLE
                         Toast.makeText(context, "Nahi mila boss", Toast.LENGTH_SHORT).show()
                     }
                 }

@@ -56,7 +56,7 @@ class MainFragment : Fragment() {
 //        view.share.setOnClickListener { shareMeme(view) }
 //        view.button2.setOnClickListener { if(isReadStoragePermissionGranted() && isWriteStoragePermissionGranted()) { saveToGallery() } }
         view.share.setOnClickListener { shareMeme(view) }
-        view.button2.setOnClickListener { dexter() }
+        view.button2.setOnClickListener { saveToGallery() }
         return view
     }
 
@@ -125,13 +125,13 @@ class MainFragment : Fragment() {
             Request.Method.GET, url, null,
             { response ->
 
-                var raw = response.getString("preview")
+                val raw = response.getString("preview")
                 val preview: List<String> = (raw.subSequence(1,raw.length-1) as String).split(",")
                 Log.i("TAGG", preview[2].replace("\\/","/"))
 
 
-                currentImageUrl = preview[2].replace("\\/","/")
-//                currentImageUrl = response.getString("url")
+//                currentImageUrl = preview[2].replace("\\/","/")
+                currentImageUrl = response.getString("url")
                 showMeme(currentImageUrl, true)
 
             },
@@ -198,26 +198,41 @@ class MainFragment : Fragment() {
 
 
     fun shareMeme(view: View) {
-        if (isReadStoragePermissionGranted() && isWriteStoragePermissionGranted()) {
-            val bitmap = (imageView.getDrawable() as BitmapDrawable).bitmap
+        Dexter.withContext(context).withPermissions(
+            Manifest.permission.WRITE_EXTERNAL_STORAGE,
+            Manifest.permission.READ_EXTERNAL_STORAGE)
+            .withListener(object: MultiplePermissionsListener {
+                override fun onPermissionsChecked(p0: MultiplePermissionsReport){
+                    if (p0.areAllPermissionsGranted()) {
+                        Toast.makeText(context, "Found permission", Toast.LENGTH_SHORT).show()
+                        val bitmap = (imageView.getDrawable() as BitmapDrawable).bitmap
 
-            //var outStream: FileOutputStream? = null
-            val sdCard = Environment.getExternalStorageDirectory().toString()
-            val dir = File(sdCard + "/DankMemes")
-            dir.mkdirs()
-            val fileName = String.format("%d.jpg", System.currentTimeMillis())
-            val outFile = File(dir, fileName)
-            val outStream = FileOutputStream(outFile)
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outStream)
-            outStream.flush()
-            outStream.close()
+                        //var outStream: FileOutputStream? = null
+                        val sdCard = Environment.getExternalStorageDirectory().toString()
+                        val dir = File(sdCard + "/DankMemes")
+                        dir.mkdirs()
+                        val fileName = String.format("%d.jpg", System.currentTimeMillis())
+                        val outFile = File(dir, fileName)
+                        val outStream = FileOutputStream(outFile)
+                        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outStream)
+                        outStream.flush()
+                        outStream.close()
 
-            val intent = Intent(Intent.ACTION_SEND)
-            intent.type = "image/jpeg"
-            intent.putExtra(Intent.EXTRA_STREAM, Uri.parse(outFile.toString()))
-            val chooser = Intent.createChooser(intent, "🤣")
-            startActivity(chooser)
-        }
+                        val intent = Intent(Intent.ACTION_SEND)
+                        intent.type = "image/jpeg"
+                        intent.putExtra(Intent.EXTRA_STREAM, Uri.parse(outFile.toString()))
+                        val chooser = Intent.createChooser(intent, "🤣")
+                        startActivity(chooser)
+
+                    } else {
+                        Toast.makeText(context, "Storage permission required", Toast.LENGTH_SHORT).show()
+                    }
+                }
+
+                override fun onPermissionRationaleShouldBeShown(p0: MutableList<PermissionRequest>?, p1: PermissionToken?) {
+                    p1?.continuePermissionRequest()
+                }
+            }).check()
     }
 
 
@@ -227,21 +242,36 @@ class MainFragment : Fragment() {
 
 
     private fun saveToGallery() {
-        if (isReadStoragePermissionGranted() && isWriteStoragePermissionGranted()) {
-            val bitmap = (imageView.getDrawable() as BitmapDrawable).bitmap
+        Dexter.withContext(context).withPermissions(
+            Manifest.permission.WRITE_EXTERNAL_STORAGE,
+            Manifest.permission.READ_EXTERNAL_STORAGE)
+            .withListener(object: MultiplePermissionsListener {
+                override fun onPermissionsChecked(p0: MultiplePermissionsReport){
+                    if (p0.areAllPermissionsGranted()) {
+                        Toast.makeText(context, "Found Permission", Toast.LENGTH_SHORT).show()
+                        val bitmap = (imageView.getDrawable() as BitmapDrawable).bitmap
 
-            //var outStream: FileOutputStream? = null
-            val sdCard = Environment.getExternalStorageDirectory().toString()
-            val dir = File(sdCard + "/DankMemes")
-            dir.mkdirs()
-            val fileName = String.format("%d.jpg", System.currentTimeMillis())
-            val outFile = File(dir, fileName)
-            val outStream = FileOutputStream(outFile)
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outStream)
-            outStream.flush()
-            outStream.close()
-            Toast.makeText(context, "Memes has been saved to $dir + $fileName", Toast.LENGTH_SHORT).show()
-        }
+                        //var outStream: FileOutputStream? = null
+                        val sdCard = Environment.getExternalStorageDirectory().toString()
+                        val dir = File(sdCard + "/DankMemes")
+                        dir.mkdirs()
+                        val fileName = String.format("%d.jpg", System.currentTimeMillis())
+                        val outFile = File(dir, fileName)
+                        val outStream = FileOutputStream(outFile)
+                        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outStream)
+                        outStream.flush()
+                        outStream.close()
+                        Toast.makeText(context, "Memes has been saved to $dir + $fileName", Toast.LENGTH_SHORT).show()
+
+                    } else {
+                        Toast.makeText(context, "No permission", Toast.LENGTH_SHORT).show()
+                    }
+                }
+
+                override fun onPermissionRationaleShouldBeShown(p0: MutableList<PermissionRequest>?, p1: PermissionToken?) {
+                    p1?.continuePermissionRequest()
+                }
+            }).check()
     }
 
 }

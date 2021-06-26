@@ -3,4 +3,9 @@
     <string name="share">SHARE</string>
     <string name="next">NEXT</string>
     <string name="save">SAVE</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="onboardingmessage">OnBoardingMessage</string>
+    <string name="continue_without_functionality">Continue without functionality</string>
+    <string name="splash_bottom_sprite">Splash bottom sprite</string>
 </resources>

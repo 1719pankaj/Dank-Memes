@@ -1,12 +1,9 @@
 package com.example.dankmemes
 
 import android.content.Context
-import android.graphics.Bitmap
 import com.android.volley.Request
 import com.android.volley.RequestQueue
-import com.android.volley.toolbox.ImageLoader
 import com.android.volley.toolbox.Volley
-import com.bumptech.glide.util.LruCache
 
 class MySingleton constructor(context: Context) {
     companion object {

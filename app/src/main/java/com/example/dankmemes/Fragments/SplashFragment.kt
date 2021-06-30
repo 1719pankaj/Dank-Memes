@@ -7,15 +7,20 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.navigation.fragment.findNavController
 import com.example.dankmemes.R
 
 class SplashFragment : Fragment() {
 
+    val MainFragment = com.example.dankmemes.Fragments.MainFragment()
+
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         // Inflate the layout for this fragment
         val view = inflater.inflate(R.layout.fragment_splash, container, false)
+
+        val t = MainFragment.fetchData()
 
         Handler().postDelayed({
             if (onBoardingFinished()) {
@@ -23,7 +28,7 @@ class SplashFragment : Fragment() {
             } else {
                 findNavController().navigate(R.id.action_splashFragment_to_onboardingFragment)
             }
-        },2000)
+        },1)
 
         return view
     }

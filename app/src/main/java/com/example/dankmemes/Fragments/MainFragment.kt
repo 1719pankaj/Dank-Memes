@@ -1,6 +1,9 @@
 package com.example.dankmemes.Fragments
 
+import android.Manifest
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.drawable.BitmapDrawable
 import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
@@ -10,6 +13,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.AbsListView
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -20,9 +25,15 @@ import com.example.dankmemes.Meme
 import com.example.dankmemes.MemeListAdapter
 import com.example.dankmemes.MySingleton
 import com.example.dankmemes.R
+import com.karumi.dexter.Dexter
+import com.karumi.dexter.MultiplePermissionsReport
+import com.karumi.dexter.PermissionToken
+import com.karumi.dexter.listener.PermissionRequest
+import com.karumi.dexter.listener.multi.MultiplePermissionsListener
 import kotlinx.android.synthetic.main.fragment_main.*
 import kotlinx.android.synthetic.main.fragment_main.view.*
 import java.io.File
+import java.io.FileOutputStream
 
 
 class MainFragment : Fragment() {
@@ -58,10 +69,15 @@ class MainFragment : Fragment() {
                 }
             }
         })
+
+        view.swipeContainer.setOnRefreshListener {
+            mAdapter.clear()
+            fetchData()
+            swipeContainer.setRefreshing(false)
+        }
+
         return view
     }
-
-
 
     fun fetchData(): Boolean {
         val url = "https://meme-api.herokuapp.com/gimme/10"
@@ -78,7 +94,10 @@ class MainFragment : Fragment() {
                         memeJsonObject.getString("author"),
                         memeJsonObject.getString("ups")
                     )
-                    memeArray.add(meme)
+                    val format = meme.url.subSequence(meme.url.length-4, meme.url.length)
+                    if(format != ".gif") {
+                        memeArray.add(meme)
+                    }
                     Log.i("TAGG","fetch data core")
                 }
                 mAdapter.updateMeme(memeArray)
@@ -91,16 +110,5 @@ class MainFragment : Fragment() {
         context?.let { MySingleton.getInstance(it).addToRequestQueue(jsonObjectRequest) }
         return true
     }
-
-    fun shareIntent(url: String, title: String) {
-        val fileName = mAdapter.downloadFromUrl(url, title, true)
-        val intent = Intent(Intent.ACTION_SEND)
-        intent.type = "image/jpeg"
-        val outFile = File(Environment.DIRECTORY_PICTURES, File.separator + "DankMemes" + File.separator + fileName)
-        intent.putExtra(Intent.EXTRA_STREAM, Uri.parse(outFile.toString()))
-        val chooser = Intent.createChooser(intent, "Dank Memes")
-        startActivity(chooser)
-    }
-
 
 }

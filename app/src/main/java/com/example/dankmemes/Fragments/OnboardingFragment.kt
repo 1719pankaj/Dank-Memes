@@ -93,13 +93,11 @@ class OnboardingFragment : Fragment() {
             .withListener(object: MultiplePermissionsListener {
                 override fun onPermissionsChecked(p0: MultiplePermissionsReport){
                     if (p0.areAllPermissionsGranted()) {
-                        Toast.makeText(context, "Mil gaya boss", Toast.LENGTH_SHORT).show()
                         findNavController().navigate(R.id.action_onboardingFragment_to_mainFragment)
                         onBoardingFinished()
                     } else {
                         onboardingMessageTV.text = "If you want to continue without permission click continue without functionality Or grant permission"
                         nextWOpermission.visibility = View.VISIBLE
-                        Toast.makeText(context, "Nahi mila boss", Toast.LENGTH_SHORT).show()
                     }
                 }
 
